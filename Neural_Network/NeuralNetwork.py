@@ -20,11 +20,9 @@ class NeuralNetwork:
     def fit(self,X,T):
         N,D = X.shape
         K = T.shape[1] # Output classes
-       
         W = np.random.randn(D,self.hidden_layer_size)
         b = np.zeros((1,self.hidden_layer_size))
-       
-        V = np.random.rand(self.hidden_layer_size,K)
+        V = np.random.randn(self.hidden_layer_size,K)
         c = np.zeros((1,K))
         cost = {}
         k = 0
@@ -32,16 +30,17 @@ class NeuralNetwork:
         for i in xrange(self.epoch):
             
             Z = sigmoid(X.dot(W) + b)
-            Y = softmax(Z.dot(V) + c)
-
-            J = (-1/N)*np.sum(T*np.log(Y))
+            # Y = sigmoid(Z.dot(V) + c) # Only one output class
+            Y = softmax(Z.dot(V) + c) # For multiclass classification 
+            # J = (-1)*( T*np.log(Y) + (1-T)*np.log(1-Y ) ).sum() / N # Cost for binary classification
+            J = (-1)* np.sum(T*np.log(Y)) / N # Cost for multiclass classification
             if i%100 == 0:
                 print "Cost = ",J
                 cost[k] = J
                 k = k+1
 
             
-            delta_output = Y-T
+            delta_output = (Y-T)*Y*(1-Y)
             delta_bias_c = delta_output.sum(axis=0)
             V = V - (self.lr/N)*(Z.T.dot(delta_output))
             c = c - (self.lr/N)*delta_bias_c
@@ -64,9 +63,16 @@ class NeuralNetwork:
 
     def predict(self,X,T):
         Z = sigmoid(X.dot(self.W) + self.b)
+        # Type one 
+        # For binary classification
+        # output = sigmoid(Z.dot(self.V) + self.c)
+        # Y = np.round(output)
+        
+        # Type two
+        # For multiclass classification
         output = softmax(Z.dot(self.V) + self.c)
         Y = np.zeros((T.shape[0],T.shape[1]))
-        Y[np.arange(T.shape[1]),output.argmax(axis=1)] = 1
+        Y[np.arange(T.shape[0]),output.argmax(axis=1)] = 1
         print "Classification rate is",(T == Y).mean()*100,"%"
         
 
