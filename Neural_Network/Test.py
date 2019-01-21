@@ -1,15 +1,32 @@
 import numpy as np 
 import pandas as pd
 import matplotlib.pyplot as plt 
+from sklearn.utils import shuffle 
+from NeuralNetwork import NeuralNetwork
 
 
-def softmax(a):
-    return np.exp(a)/np.sum(np.exp(a))
+df = pd.read_csv('../Logistic_Regression/train.csv')
+print df.columns
+df = df[['Pclass','Sex','Age','SibSp','Parch','Survived']]
 
-b = softmax(np.array([1,1,1]))
-print softmax(b)
+df = shuffle(df)
+df['Age'].fillna(df['Age'].mean(),inplace =True)
+df['SibSp'].fillna(df['SibSp'].mean(),inplace =True)
+df['Parch'].fillna(df['Parch'].mean(),inplace =True)
+df['Pclass'].fillna(df['Pclass'].mean(),inplace =True)
 
-a = np.array([[1,1],[2,2],[3,3]])
-print a
-b = np.array([4,4])
-print (a+b)
+
+gender_dict = {'male':1,'female':0}
+df['Sex'] = df['Sex'].map(gender_dict)
+
+cutoff = int(len(df)*0.8)
+Xtrain = df.values[:cutoff,:-1]
+Ttrain = df.values[:cutoff,-1:]
+Xtest = df.values[-cutoff:,:-1]
+Ttest = df.values[-cutoff:,-1:]
+
+lr = NeuralNetwork(10000,0.003,10)
+lr.fit(Xtrain,Ttrain)
+lr.predict(Xtest,Ttest)
+
+
