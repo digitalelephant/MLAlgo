@@ -40,7 +40,8 @@ class NeuralNetwork:
                 k = k+1
 
             
-            delta_output = (Y-T)*Y*(1-Y)
+            # delta_output = (Y-T)*Y*(1-Y) # For sigmoid output
+            delta_output = Y-T # For softmax output
             delta_bias_c = delta_output.sum(axis=0)
             V = V - (self.lr/N)*(Z.T.dot(delta_output))
             c = c - (self.lr/N)*delta_bias_c

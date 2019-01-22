@@ -46,7 +46,7 @@ Ttest = Y[-cutoff:,:]
 # Xtest = df.values[-cutoff:,:-1]
 # Ttest = df.values[-cutoff:,-1:]
 
-lr = NeuralNetwork(3000,0.03,32)
+lr = NeuralNetwork(2500,0.03,64)
 lr.fit(Xtrain,Ttrain)
 lr.predict(Xtest,Ttest)
 
