@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 from sklearn.utils import shuffle 
 from NeuralNetwork import NeuralNetwork
+from NNLayers import NNLayers
 
 
 df = pd.read_csv('train.csv')
@@ -46,8 +47,9 @@ Ttest = Y[-cutoff:,:]
 # Xtest = df.values[-cutoff:,:-1]
 # Ttest = df.values[-cutoff:,-1:]
 
-lr = NeuralNetwork(2500,0.03,64)
-lr.fit(Xtrain,Ttrain)
-lr.predict(Xtest,Ttest)
+# lr = NeuralNetwork(2500,0.03,64)
+# lr.fit(Xtrain,Ttrain)
+# lr.predict(Xtest,Ttest)
 
-
+nn = NNLayers(0.03,2500,np.array([10,10,5]))
+nn.fit(Xtrain,Ttrain)
