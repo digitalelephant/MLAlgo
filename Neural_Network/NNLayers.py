@@ -6,7 +6,7 @@ def sigmoid(a):
 
 def softmax(a):
     expA = np.exp(a)
-    return expA / np.sum(expA,axis=1,keepdims=True)
+    return expA / expA.sum(axis=1,keepdims=True)
 
 class NNLayers:
 
@@ -22,7 +22,6 @@ class NNLayers:
         N,D = X.shape
         K = T.shape[1]
 
-        # Feed forward
 
 
         S = {}
@@ -39,25 +38,64 @@ class NNLayers:
         for i in xrange(len(self.layer_sizes)+1):
             W[i] = np.random.randn(S[i],S[i+1])
         
-        Z = {}
-        for i in xrange(len(self.layer_sizes)+2):
-            if i == 0:
-                Z[i] = X
+        cost = {}
+        k = 0 
+
+        for e in xrange(self.epoch):
+            # Feed forward
+        
+            Z = {}
+            for i in xrange(len(self.layer_sizes)+2):
+                if i == 0:
+                    Z[i] = X
+                elif i == len(self.layer_sizes)+1:
+                    Z[i] = softmax(Z[i-1].dot(W[i-1]))
+                else:
+                    Z[i] = sigmoid(Z[i-1].dot(W[i-1]))
+
+            Y = Z[len(self.layer_sizes)+1]
+
+            
+            # Back propagation
+            
+            error = {}
+            derivative = {}
+            
+            
+            i = len(self.layer_sizes)+1
+
+            while i > 0:
+                if i == len(self.layer_sizes)+1:
+                    error[i] = Z[i]-T
+                    derivative[i-1] = Z[i-1].T.dot(error[i])
+                    W[i-1] -= (self.learning_rate/N)*derivative[i-1]
+                else:
+                    error[i] = error[i+1].dot(W[i].T)*Z[i]*(1-Z[i])
+                    derivative[i-1] = Z[i-1].T.dot(error[i])
+                    W[i-1] -= (self.learning_rate/N)*derivative[i-1]
+                i -= 1
+            
+            J = (-1)* np.sum(T*np.log(Y)) / N            
+   
+            if e%100 == 0:
+                print 'Cost is ',J
+                cost[k] = J
+                k += 1
+        
+        self.W = W  
+
+        plt.plot(cost.keys(),cost.values())
+        plt.show()
+
+    def predict(self,X,T):
+        prev = X
+        for i in xrange(len(self.W)):
+            if i == len(self.W)-1:
+                prev = softmax(prev.dot(self.W[i]))
             else:
-                Z[i] = sigmoid(Z[i-1].dot(W[i-1]))
-
-        Y = Z[len(self.layer_sizes)+1]
-        print Y[0:2,:]
-
-        error = {}
-        derivative = {}
+                prev = sigmoid(prev.dot(self.W[i]))
         
-        # Back propagation
+        Y = np.zeros((T.shape[0],T.shape[1]))
+        Y[np.arange(T.shape[0]),prev.argmax(axis=1)] = 1
+        print "Classification rate is",(T == Y).mean()*100,"%"
         
-        i = len(self.layer_sizes)+1
-        
-
-
-
-    
-

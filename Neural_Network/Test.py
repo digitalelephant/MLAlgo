@@ -51,5 +51,6 @@ Ttest = Y[-cutoff:,:]
 # lr.fit(Xtrain,Ttrain)
 # lr.predict(Xtest,Ttest)
 
-nn = NNLayers(0.03,2500,np.array([10,10,5]))
+nn = NNLayers(0.03,2000,np.array([128,128,128]))
 nn.fit(Xtrain,Ttrain)
+nn.predict(Xtest,Ttest)
